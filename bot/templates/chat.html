@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 YouTube AI Аналитик</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .chat-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background: #4a5568;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .chat-header p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        .data-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #48bb78;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        #chatbox {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f7fafc;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 85%;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-message {
+            background: #4a5568;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        .bot-message {
+            background: white;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .analysis-badge {
+            display: inline-block;
+            background: #4a5568;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        .real-data-badge {
+            background: #48bb78;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+        .metrics-highlight {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9em;
+        }
+        .error-message {
+            background: #fed7d7;
+            border-left: 4px solid #e53e3e;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            color: #c53030;
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background: #e2e8f0;
+            border-top: 1px solid #cbd5e0;
+        }
+        .quick-action-btn {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .quick-action-btn:hover {
+            background: #2d3748;
+            transform: translateY(-2px);
+        }
+        .input-container {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        #messageInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #cbd5e0;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #messageInput:focus {
+            border-color: #4a5568;
+        }
+        button {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2d3748;
+        }
+        .typing-indicator {
+            padding: 10px 15px;
+            color: #718096;
+            font-style: italic;
+        }
+        .data-warning {
+            background: #fffaf0;
+            border: 1px solid #ed8936;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+            color: #dd6b20;
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="data-status">✅ РЕАЛЬНЫЕ ДАННЫЕ</div>
+            <h1>🎬 YouTube AI Аналитик</h1>
+            <p>Анализ реальных данных из базы YouTube в реальном времени</p>
+        </div>
+
+        <div id="chatbox">
+            <div class="message bot-message">
+                <strong>YouTube Аналитик</strong>
+                <span class="analysis-badge">📊 Реальные данные</span><br><br>
+                ✅ <strong>Система работает с реальными данными</strong><br><br>
+                • 📊 Анализ актуальных видео из базы данных<br>
+                • 📈 Статистика на основе реальных метрик<br>
+                • 💡 Рекомендации основанные на фактах<br>
+                • 🔄 Данные обновляются в реальном времени<br><br>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="sendQuickAction('Покажи самые популярные видео из базы')">
+                🏆 Топ видео
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickAction('Проанализируй статистику каналов')">
+                📺 Анализ каналов
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickAction('Дай рекомендации по контенту на основе данных')">
+                💡 Рекомендации
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickAction('Покажи общую статистику базы')">
+                📈 Общая статистика
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickAction('Какие темы самые популярные?')">
+                🏷️ Анализ тем
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickAction('Обнови данные из базы')">
+                🔄 Обновить данные
+            </button>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Задайте вопрос о реальных данных YouTube..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+
+    <script>
+        function addMessage(text, isUser = false, analysisType = null, metrics = null, isError = false) {
+            const chatbox = document.getElementById('chatbox');
+            const messageDiv = document.createElement('div');
+
+            if (isError) {
+                messageDiv.className = 'error-message';
+                messageDiv.innerHTML = `<strong>❌ Ошибка</strong><br><br>${text}`;
+            } else {
+                messageDiv.className = isUser ? 'message user-message' : 'message bot-message';
+
+                let messageContent = text;
+                if (analysisType && !isUser) {
+                    let badge = analysisType + '<span class="real-data-badge">РЕАЛЬНЫЕ ДАННЫЕ</span>';
+                    messageContent = `<strong>YouTube Аналитик</strong> <span class="analysis-badge">${badge}</span><br><br>${text}`;
+                } else if (isUser) {
+                    messageContent = `<strong>Вы</strong><br><br>${text}`;
+                }
+
+                // Add metrics highlight if provided
+                if (metrics && !isUser) {
+                    messageContent += `<div class="metrics-highlight"><strong>📊 Использованы данные:</strong> ${metrics}</div>`;
+                }
+
+                messageDiv.innerHTML = messageContent;
+            }
+
+            chatbox.appendChild(messageDiv);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const chatbox = document.getElementById('chatbox');
+            const indicator = document.createElement('div');
+            indicator.className = 'typing-indicator';
+            indicator.id = 'typingIndicator';
+            indicator.textContent = 'AI анализирует реальные данные из базы...';
+            chatbox.appendChild(indicator);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            addMessage(message, true);
+            input.value = '';
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                hideTypingIndicator();
+
+                if (data.reply) {
+                    addMessage(data.reply, false, data.analysis_type, data.data_used);
+                } else if (data.error) {
+                    addMessage(data.error, false, null, null, true);
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('Ошибка соединения с сервером', false, null, null, true);
+            }
+        }
+
+        function sendQuickAction(actionText) {
+            document.getElementById('messageInput').value = actionText;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+
+        document.getElementById('messageInput').focus();
+
+
+        window.addEventListener('load', function() {
+            const chatbox = document.getElementById('chatbox');
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'typing-indicator';
+            loadingMsg.textContent = 'Загрузка реальных данных из базы...';
+            chatbox.appendChild(loadingMsg);
+        });
+    </script>
+</body>
+</html>
