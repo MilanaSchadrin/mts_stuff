@@ -8,6 +8,8 @@ postgres/data/
 env/
 venv/
 .env
+.venv/
+myenv/
 .DS_Store
 *.sqlite3
 *.log
