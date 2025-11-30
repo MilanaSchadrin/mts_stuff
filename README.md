@@ -17,26 +17,34 @@
 
 > Важно: Python 3.12 совместим с Airflow 3.x
 ---
-## Структура
+## Структура проекта
 
+```
 mts_stuff/
-├── docker-compose.yml
-├── requirements.txt
+├── docker-compose.yml         # Конфигурация сервисов Airflow + PostgreSQL
+├── requirements.txt           # Все Python-зависимости проекта
+
 ├── airflow/
 │   └── dags/
-│       └── orchestrator.py
+│       └── orchestrator.py    # DAG Airflow: оркестрация пайплайна
+
 ├── youtube/
-│   ├── insert_records.py
-│   ├── api?request.py
-│   └── params.py
+│   ├── insert_records.py      # Запись результата API в БД
+│   ├── api_request.py         # Логика запросов к YouTube Data API
+│   └── params.py              # Параметры YouTube API, задержки, лимиты
+
 ├── mwts/
-│   ├── params_two.py
-├── analytics.py
-│   ├── get_records_send_video.py
-│   └── get_records_send_channel.py
+│   ├── params_two.py          # Дополнительные параметры/константы для MWTS
+│   ├── analytics.py           # Аналитические функции и агрегации
+│   ├── get_records_send_video.py    # Получение + отправка данных о видео
+│   └── get_records_send_channel.py  # Получение + отправка данных о каналах
+
 ├── postgres/
-│   ├── data/
-│   └── airflow_init.sql
+│   ├── data/                  # Хранилище данных PostgreSQL (volume)
+│   └── airflow_init.sql       # Скрипт инициализации базы: схемы, таблицы
+```
+
+---
 
 ## Конфигурация
 
