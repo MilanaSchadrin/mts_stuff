@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:14.18
+    container_name: postgres_container
+    ports:
+      - 5000:5432
+    environment:
+      POSTGRES_DB: airflow_db
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/airflow_init.sql:/docker-entrypoint-initdb.d/airflow_init.sql
+    networks:
+      - my-network
+
+  af:
+    image: apache/airflow:3.1.3
+    container_name: airflow_container
+    ports:
+      - 8000:8080
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@db:5432/airflow_db
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      PYTHONPATH: /opt/airflow/youtube:/opt/airflow/mwts
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./youtube:/opt/airflow/youtube
+      - ./mwts:/opt/airflow/mwts
+    depends_on:
+      - db
+    networks:
+      - my-network
+    command: airflow standalone
+
+networks:
+  my-network:
+    driver: bridge

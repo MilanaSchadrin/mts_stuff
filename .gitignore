@@ -1,0 +1,13 @@
+__pycache__/
+!dags/
+!dags/*.py
+postgres/data/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.env
+.DS_Store
+*.sqlite3
+*.log
