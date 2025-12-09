@@ -11,7 +11,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = ""
 MWS_API_TOKEN = "uskRJrUwVfVy9PTdYVhCPoN"
 
 YOUTUBE_API_URL = "https://tables.mws.ru/fusion/v1/datasheets/dstoLqB3Hci6MqrEKH/records?viewId=viwXBJe2lMPB4&fieldKey=name"
