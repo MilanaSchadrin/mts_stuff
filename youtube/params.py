@@ -4,7 +4,7 @@ import  psycopg2
 import psycopg2.extras
 import requests
 
-YOUTUBE_API_KEY = "AIzaSyDgZPtOQD21X19L3EFGvMlA6P7uJxeuHos"
+YOUTUBE_API_KEY = ""
 TOPICS = [
     "technology",
     "finance",
